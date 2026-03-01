@@ -61,34 +61,40 @@ public class CityRepository {
     }
 
     public List<City> findByName(String name) {
-        String query = "SELECT c.id, c.countryId, c.name FROM city as c WHERE c.name like '" + name + "'";
-        try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet rs = statement.executeQuery(query)) {
-            List<City> cityList = new ArrayList<>();
-            while (rs.next()) {
-                int id = rs.getInt(1);
-                int countryId = rs.getInt(2);
+        String query = "SELECT c.id, c.countryId, c.name FROM city c WHERE c.name LIKE ?";
 
-                cityList.add(new City(id, countryId, name));
+        List<City> cityList = new ArrayList<>();
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, "%" + name + "%");
+
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+                    int countryId = rs.getInt("countryId");
+                    String cityName = rs.getString("name");
+
+                    cityList.add(new City(id, countryId, cityName));
+                }
             }
 
-            return cityList;
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return null;
+        return cityList;
     }
 
     public long create(City city) {
-        String query = "INSERT INTO city(countryid, name) VALUES(?, '" + city.getName() + "')";
+        String query = "INSERT INTO city(countryid, name) VALUES(?, ?)";
         long id = -1;
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
         ) {
             statement.setInt(1, city.getCountryId());
+            statement.setString(2, city.getName());
             int rows = statement.executeUpdate();
 
             if (rows == 0) {

@@ -44,8 +44,8 @@
         </thead>
         <tbody id="countriesTableContent">
         <tr th:each="country : ${countries}">
-            <td th:utext="${country.id}"></td>
-            <td th:utext="${country.name}"></td>
+            <td th:text="${country.id}"></td>
+            <td th:text="${country.name}"></td>
         </tr>
         </tbody>
     </table>

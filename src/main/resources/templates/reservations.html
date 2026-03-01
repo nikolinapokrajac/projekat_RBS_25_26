@@ -32,14 +32,14 @@
         </thead>
         <tbody>
         <tr th:each="r : ${userReservations}">
-            <td th:utext="${r.id}"></td>
-            <td th:utext="${r.hotelName}"></td>
-            <td th:utext="${r.roomTypeName}"></td>
-            <td th:utext="${r.startDate}"></td>
-            <td th:utext="${r.endDate}"></td>
-            <td th:utext="${r.roomsCount}"></td>
-            <td th:utext="${r.guestsCount}"></td>
-            <td th:utext="${r.totalPrice}"></td>
+            <td th:text="${r.id}"></td>
+            <td th:text="${r.hotelName}"></td>
+            <td th:text="${r.roomTypeName}"></td>
+            <td th:text="${r.startDate}"></td>
+            <td th:text="${r.endDate}"></td>
+            <td th:text="${r.roomsCount}"></td>
+            <td th:text="${r.guestsCount}"></td>
+            <td th:text="${r.totalPrice}"></td>
 
             <td>
                 <form th:action="@{/reservations/delete(id=${r.id})}" method="post"
@@ -72,15 +72,15 @@
         </thead>
         <tbody>
         <tr th:each="r : ${allReservations}">
-            <td th:utext="${r.id}"></td>
-            <td th:utext="${r.userId}"></td>
-            <td th:utext="${r.hotelName}"></td>
-            <td th:utext="${r.roomTypeName}"></td>
-            <td th:utext="${r.startDate}"></td>
-            <td th:utext="${r.endDate}"></td>
-            <td th:utext="${r.roomsCount}"></td>
-            <td th:utext="${r.guestsCount}"></td>
-            <td th:utext="${r.totalPrice}"></td>
+            <td th:text="${r.id}"></td>
+            <td th:text="${r.userId}"></td>
+            <td th:text="${r.hotelName}"></td>
+            <td th:text="${r.roomTypeName}"></td>
+            <td th:text="${r.startDate}"></td>
+            <td th:text="${r.endDate}"></td>
+            <td th:text="${r.roomsCount}"></td>
+            <td th:text="${r.guestsCount}"></td>
+            <td th:text="${r.totalPrice}"></td>
 
             <td>
                 <form th:action="@{/reservations/delete(id=${r.id})}" method="post"
