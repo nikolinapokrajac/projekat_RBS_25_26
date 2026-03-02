@@ -9,7 +9,7 @@
     <title>Hotel Search</title>
 </head>
 <body>
-<div layout:fragment="content">
+<div layout:fragment="content" sec:authorize="hasAuthority('VIEW_HOTEL_LIST')">
     <h1>Hotels</h1>
     <div class="container">
         <div class="input-group mb-3">

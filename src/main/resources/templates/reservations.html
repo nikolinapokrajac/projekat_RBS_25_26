@@ -10,11 +10,11 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Reservations</title>
 </head>
-<body>
-<div layout:fragment="content" class="container">
-    <h1>Reservations</h1>
+<body >
+<div th:disabled="${not #authorization.expression('hasAuthority(''VIEW_RESERVATION'')')}" layout:fragment="content" class="container">
+    <h1 >Reservations</h1>
 
-    <h2 class="mt-4">My reservations</h2>
+    <h2 th:if="${userReservations != null && !#lists.isEmpty(userReservations)}">My reservations</h2>
 
     <table class="table table-striped">
         <thead>
@@ -31,7 +31,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="r : ${userReservations}">
+        <tr  th:each="r : ${userReservations}">
             <td th:utext="${r.id}"></td>
             <td th:utext="${r.hotelName}"></td>
             <td th:utext="${r.roomTypeName}"></td>
@@ -53,7 +53,7 @@
 
     <hr class="mt-4 mb-4"/>
 
-    <h2>All reservations</h2>
+    <h2 th:if="${allReservations != null && !#lists.isEmpty(allReservations)}" >All reservations</h2>
 
     <table class="table table-striped" th:if="${allReservations != null && !#lists.isEmpty(allReservations)}">
         <thead>

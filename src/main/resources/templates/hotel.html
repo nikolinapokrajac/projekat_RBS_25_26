@@ -9,7 +9,7 @@
     <title>Hotel Details</title>
 </head>
 <body>
-<div layout:fragment="content">
+<div layout:fragment="content" sec:authorize="hasAuthority('VIEW_HOTEL')">
     <h1>Hotel details</h1>
 
     <div class="row">
@@ -36,7 +36,7 @@
                 <b><label>Description:</label></b>
                 <label style="text-align: justify; display: block;" th:text="${hotel.description}"></label>
             </div>
-            <div class="form-group">
+            <div class="form-group" sec:authorize="hasAuthority('RATE_HOTEL')">
                 <label>Rating:</label>
                 <b><label th:text="${averageRating}"></label></b>
             </div>
