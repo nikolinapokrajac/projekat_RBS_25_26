@@ -8,12 +8,14 @@ import com.zuehlke.securesoftwaredevelopment.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -40,7 +42,8 @@ public class PersonsController {
     }
 
     @GetMapping("/myprofile")
-    public String self(Model model, Authentication authentication) {
+    public String self(Model model, Authentication authentication, HttpSession session) {
+        model.addAttribute("CSRF_TOKEN", session.getAttribute("CSRF_TOKEN"));
         User user = (User) authentication.getPrincipal();
         model.addAttribute("person", personRepository.get("" + user.getId()));
         model.addAttribute("username", userRepository.findUsername(user.getId()));
@@ -56,7 +59,12 @@ public class PersonsController {
     }
 
     @PostMapping("/update-person")
-    public String updatePerson(Person person, String username) {
+    public String updatePerson(Person person, String username,HttpSession session, @RequestParam("csrfToken") String csrfToken) throws
+            AccessDeniedException {
+        String csrf = session.getAttribute("CSRF_TOKEN").toString();
+        if (!csrf.equals(csrfToken)) {
+            throw new AccessDeniedException("Forbidden");
+        }
         personRepository.update(person);
         userRepository.updateUsername(Integer.parseInt(person.getId()), username);
         return "redirect:/persons/" + person.getId();
