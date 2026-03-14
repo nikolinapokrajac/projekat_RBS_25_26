@@ -31,11 +31,11 @@ public class CountryRepository {
                 int id = rs.getInt(1);
                 String name = rs.getString(2);
                 countryList.add(new Country(id, name));
+                LOG.info("Nova država učitana sa ID: {}", id);
             }
-
             return countryList;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom učitavanja države: {}", e.getMessage());
         }
 
         return null;
@@ -49,10 +49,11 @@ public class CountryRepository {
             if (rs.next()) {
                 int id = rs.getInt(1);
                 String name = rs.getString(2);
+                LOG.info("Država sa ID {} učitana", id);
                 return new Country(id, name);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom učitavanja države sa ID {}: {}", countryId, e.getMessage());
         }
 
         return null;
@@ -67,11 +68,12 @@ public class CountryRepository {
             while (rs.next()) {
                 int id = rs.getInt(1);
                 countryList.add(new Country(id, name));
+                LOG.info("Pronađena država: {}", rs.getString("name"));
             }
 
             return countryList;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom pretrage država: {}", e.getMessage());
         }
 
         return null;
@@ -89,8 +91,10 @@ public class CountryRepository {
             if (rows == 0) {
                 throw new SQLException("Creating city failed, no rows affected.");
             }
+            auditLogger.audit("Kreirana nova država sa ID: " + id + " sa nazivom: " + country.getName());
+            LOG.info("Nova država sa ID {} i nazivom '{}' uspješno kreirana.", id, country.getName());
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom kreiranja države: {}", e.getMessage());
         }
 
         return id;

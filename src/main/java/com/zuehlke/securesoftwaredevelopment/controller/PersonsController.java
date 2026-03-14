@@ -38,6 +38,7 @@ public class PersonsController {
     public String person(@PathVariable int id, Model model) {
         model.addAttribute("person", personRepository.get("" + id));
         model.addAttribute("username", userRepository.findUsername(id));
+        auditLogger.audit("Prikazan profil osobe sa ID: " + id);
         return "person";
     }
 
@@ -47,6 +48,7 @@ public class PersonsController {
         User user = (User) authentication.getPrincipal();
         model.addAttribute("person", personRepository.get("" + user.getId()));
         model.addAttribute("username", userRepository.findUsername(user.getId()));
+        auditLogger.audit("Prikazan vlastiti profil korisnika sa ID: " + user.getId());
         return "person";
     }
 
@@ -54,7 +56,7 @@ public class PersonsController {
     public ResponseEntity<Void> person(@PathVariable int id) {
         personRepository.delete(id);
         userRepository.delete(id);
-
+        auditLogger.audit("Osoba sa ID: " + id + " je obrisana");
         return ResponseEntity.noContent().build();
     }
 
@@ -67,18 +69,21 @@ public class PersonsController {
         }
         personRepository.update(person);
         userRepository.updateUsername(Integer.parseInt(person.getId()), username);
+        auditLogger.audit("Podaci osobe sa ID: " + person.getId() + " su ažurirani");
         return "redirect:/persons/" + person.getId();
     }
 
     @GetMapping("/persons")
     public String persons(Model model) {
         model.addAttribute("persons", personRepository.getAll());
+        auditLogger.audit("Prikaz svih osoba");
         return "persons";
     }
 
     @GetMapping(value = "/persons/search", produces = "application/json")
     @ResponseBody
     public List<Person> searchPersons(@RequestParam String searchTerm) throws SQLException {
+        auditLogger.audit("Pretraga osoba sa upitom: " + searchTerm);
         return personRepository.search(searchTerm);
     }
 }

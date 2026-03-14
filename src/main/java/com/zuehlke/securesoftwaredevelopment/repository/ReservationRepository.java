@@ -20,9 +20,11 @@ public class ReservationRepository {
     private static final AuditLogger auditLogger = AuditLogger.getAuditLogger(ReservationRepository.class);
 
     private final DataSource dataSource;
+    private final HotelRepository hotelRepository;
 
-    public ReservationRepository(DataSource dataSource) {
+    public ReservationRepository(DataSource dataSource, HotelRepository hotelRepository) {
         this.dataSource = dataSource;
+        this.hotelRepository = hotelRepository;
     }
 
     public long create(Reservation r) {
@@ -51,10 +53,12 @@ public class ReservationRepository {
             if (generatedKeys.next()) {
                 id = generatedKeys.getLong(1);
             }
+            auditLogger.audit("Kreiran nova rezervacija za hotel ID: " + r.getHotelId() + " od strane korisnika ID: " + r.getUserId());
 
+            LOG.info("Rezervacija uspješno dodan za hotel ID: {} od korisnika ID: {}", r.getHotelId(), r.getUserId());
             return id;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom dodavanja rezevacije za hotel ID {}: {}", r.getHotelId(), e.getMessage());
         }
 
         return id;
@@ -71,8 +75,9 @@ public class ReservationRepository {
                 Reservation r = createPersonFromResultSet(rs);
                 reservationList.add(r);
             }
+            LOG.info("Učitano {} rezervacija za hotel ID: {}", reservationList.size(), reservationList.get(0).getHotelId());
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom učitavanja rezervacija za hotel ID {}: {}", reservationList.get(0).getHotelId(), e.getMessage());
         }
 
         return reservationList;

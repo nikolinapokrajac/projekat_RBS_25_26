@@ -36,15 +36,17 @@ public class RatingRepository {
                 preparedStatement.setInt(2, rating.getHotelId());
                 preparedStatement.setInt(3, rating.getUserId());
                 preparedStatement.executeUpdate();
+                LOG.info("Ažurirana ocjena za hotel ID {} od korisnika ID {}", rating.getHotelId(), rating.getUserId());
             } else {
                 PreparedStatement preparedStatement = connection.prepareStatement(query3);
                 preparedStatement.setInt(1, rating.getHotelId());
                 preparedStatement.setInt(2, rating.getUserId());
                 preparedStatement.setInt(3, rating.getRating());
                 preparedStatement.executeUpdate();
+                LOG.info("Dodana nova ocjena za hotel ID {} od korisnika ID {}", rating.getHotelId(), rating.getUserId());
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom kreiranja ili ažuriranja ocjene za hotel ID {} od korisnika ID {}: {}", rating.getHotelId(), rating.getUserId(), e.getMessage());
         }
     }
 
@@ -56,9 +58,10 @@ public class RatingRepository {
              ResultSet rs = statement.executeQuery(query)) {
             while (rs.next()) {
                 ratingList.add(new Rating(rs.getInt(1), rs.getInt(2), rs.getInt(3)));
+                LOG.info("Uspješno učitane ocjene za hotel ID {}", hotelId);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom učitavanja ocjena za hotel ID {}: {}", hotelId, e.getMessage());
         }
         return ratingList;
     }

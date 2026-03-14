@@ -35,8 +35,9 @@ public class PermissionRepository {
                 String name = rs.getString(2);
                 permissions.add(new Permission(id, name));
             }
+            LOG.info("Uspješno pronađene permisije za roleId: {}", roleId);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom pronalaženja permisija za roleId {}: {}", roleId, e.getMessage());
         }
         return permissions;
     }

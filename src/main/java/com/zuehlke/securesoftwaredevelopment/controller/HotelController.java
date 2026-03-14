@@ -40,6 +40,8 @@ public class HotelController {
     @GetMapping("/")
     public String showSearch(Model model) {
         model.addAttribute("hotels", hotelRepository.getAll());
+        auditLogger.audit("Prikaz svih hotela na početnoj stranici");
+        LOG.info("Prikaz svih hotela na početnoj stranici");
         return "hotels";
     }
 
@@ -47,6 +49,8 @@ public class HotelController {
     public String showHotels(@RequestParam(name = "id", required = false) String id, Model model, Authentication authentication) {
         if (id == null) {
             model.addAttribute("hotels", hotelRepository.getAll());
+            auditLogger.audit("Prikaz svih hotela na stranici 'hotels'");
+            LOG.info("Prikaz svih hotela na stranici 'hotels'");
             return "hotels";
         }
         User user = (User) authentication.getPrincipal();
@@ -61,7 +65,8 @@ public class HotelController {
         }
 
         model.addAttribute("hotel", hotelRepository.get(Integer.valueOf(id)));
-
+        auditLogger.audit("Prikazan hotel sa ID: " + id);
+        LOG.info("Prikazan hotel sa ID: {}", id);
         return "hotel";
     }
 
@@ -113,7 +118,7 @@ public class HotelController {
 
         Hotel hotel = new Hotel(cityId, name, description, address);
         hotelRepository.create(hotel);
-
+        LOG.info("Novi hotel dodan sa ID: {}", hotel.getId());
         return "redirect:/hotels/new-hotel";
     }
 

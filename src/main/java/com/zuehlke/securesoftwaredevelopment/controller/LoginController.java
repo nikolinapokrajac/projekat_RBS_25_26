@@ -1,5 +1,6 @@
 package com.zuehlke.securesoftwaredevelopment.controller;
 
+import com.zuehlke.securesoftwaredevelopment.config.AuditLogger;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class LoginController {
 
     private final HashedUserRepository repository;
+    private static final AuditLogger auditLogger = AuditLogger.getAuditLogger(RatingsController.class);
 
     LoginController(HashedUserRepository repository) {
         this.repository = repository;
@@ -38,7 +40,7 @@ public class LoginController {
         final HashedUser user = (HashedUser) authentication.getPrincipal();;
         String totpUrl = GoogleAuthenticatorQRGenerator.getOtpAuthTotpURL("RBS Secure Travel Agency", user.getUsername(), key);
         model.addAttribute("totpUrl", totpUrl);
-
+        auditLogger.audit("Korisnik sa username: " + user.getUsername() + " je zatražio registraciju TOTP ključa");
         return "register-totp";
     }
 
@@ -46,6 +48,7 @@ public class LoginController {
     public String registerTotp(@RequestParam() String totpKey, Model model, Authentication authentication) {
         final HashedUser user = (HashedUser) authentication.getPrincipal();
         repository.saveTotpKey(user.getUsername(), totpKey);
+        auditLogger.audit("Korisnik sa username: " + user.getUsername() + " je uspešno registrirao TOTP ključ");
         model.addAttribute("registered", true);
         return "register-totp";
     }

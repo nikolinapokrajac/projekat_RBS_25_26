@@ -33,8 +33,9 @@ public class PersonRepository {
             while (rs.next()) {
                 personList.add(createPersonFromResultSet(rs));
             }
+            auditLogger.audit("Uspješno učitane sve osobe.");
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom učitavanja osoba: {}", e.getMessage());
         }
         return personList;
     }
@@ -49,6 +50,7 @@ public class PersonRepository {
             while (rs.next()) {
                 personList.add(createPersonFromResultSet(rs));
             }
+            auditLogger.audit("Uspješno izvršena pretraga sa terminom: " + searchTerm);
         }
         return personList;
     }
@@ -62,20 +64,21 @@ public class PersonRepository {
                 return createPersonFromResultSet(rs);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom učitavanja osobe sa ID {}: {}", personId, e.getMessage());
         }
 
         return null;
     }
 
-    public void delete(int personId) {
+    public void delete(int personId){
         String query = "DELETE FROM persons WHERE id = " + personId;
         try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement();
         ) {
             statement.executeUpdate(query);
+            auditLogger.audit("Obrisana osoba sa ID: " + personId);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom brisanja osobe sa ID {}: {}", personId, e.getMessage());
         }
     }
 
@@ -99,8 +102,9 @@ public class PersonRepository {
             statement.setString(1, firstName);
             statement.setString(2, email);
             statement.executeUpdate();
+            auditLogger.audit("Ažurirana osoba sa ID: " + personUpdate.getId());
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom ažuriranja osobe sa ID {}: {}", personUpdate.getId(), e.getMessage());
         }
     }
 }

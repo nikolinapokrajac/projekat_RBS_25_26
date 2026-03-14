@@ -34,9 +34,10 @@ public class CityRepository {
                 String countryName = rs.getString(4);
 
                 cityList.add(new City(id, countryId, name, countryName));
+                LOG.info("Novi grad ucitan sa ID: {}", id);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom učitavanja grada: {}", e.getMessage());
         }
 
         return cityList;
@@ -51,10 +52,11 @@ public class CityRepository {
                 int id = rs.getInt(1);
                 int countryId = rs.getInt(2);
                 String name = rs.getString(3);
+                LOG.info("Grad sa ID {} učitan", cityId);
                 return new City(id, countryId, name);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom učitavanja grada sa ID {}: {}", cityId, e.getMessage());
         }
 
         return null;
@@ -62,6 +64,7 @@ public class CityRepository {
 
     public List<City> findByName(String name) {
         String query = "SELECT c.id, c.countryId, c.name FROM city c WHERE c.name LIKE ?";
+
 
         List<City> cityList = new ArrayList<>();
 
@@ -76,11 +79,13 @@ public class CityRepository {
                     String cityName = rs.getString("name");
 
                     cityList.add(new City(id, countryId, cityName));
+                    LOG.info("Pronađen grad: {}", rs.getString("name"));
                 }
+
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom pretrage gradova: {}", e.getMessage());
         }
 
         return cityList;
@@ -105,10 +110,13 @@ public class CityRepository {
             if (generatedKeys.next()) {
                 id = generatedKeys.getLong(1);
             }
+            auditLogger.audit("Kreiran novi grad sa ID: " + id + " sa nazivom: " + city.getName());
+            LOG.info("Novi grad sa ID {} i nazivom '{}' uspješno kreiran.", id, city.getName());
+
 
             return id;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom kreiranja grada: {}", e.getMessage());
         }
 
         return id;

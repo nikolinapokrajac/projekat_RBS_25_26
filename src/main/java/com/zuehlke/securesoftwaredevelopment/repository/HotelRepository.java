@@ -66,9 +66,10 @@ public class HotelRepository {
                 hotel.setCityName(cityName);
 
                 hotelList.add(hotel);
+                LOG.info("Učitan hotel: {}", hotel.getName());
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom učitavanja hotela: {}", e.getMessage());
         }
 
         return hotelList;
@@ -82,10 +83,11 @@ public class HotelRepository {
              Statement statement = connection.createStatement();
              ResultSet rs = statement.executeQuery(query)) {
             if (rs.next()) {
+                LOG.info("Hotel sa ID {} učitan", hotelId);
                 return crateHotelFromResultSet(rs);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom učitavanja hotela sa ID {}: {}", hotelId, e.getMessage());
         }
 
         return null;
@@ -125,10 +127,12 @@ public class HotelRepository {
             if (generatedKeys.next()) {
                 id = generatedKeys.getLong(1);
             }
+            auditLogger.audit("Kreiran novi hotel sa ID: " + id + " sa nazivom: " + hotel.getName());
 
+            LOG.info("Nova knjiga sa ID {} i nazivom '{}' uspešno kreirana.", id, hotel.getName());
             return id;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom kreiranja hotela: {}", e.getMessage());
         }
         return id;
     }
@@ -144,7 +148,11 @@ public class HotelRepository {
              ResultSet rs = statement.executeQuery(query)) {
             while (rs.next()) {
                 destinationList.add(crateHotelFromResultSet(rs));
+                LOG.info("Pronađen hotel: {}", rs.getString("name"));
             }
+        }
+        catch (SQLException e) {
+            LOG.error("Greška prilikom pretrage hotela: {}", e.getMessage());
         }
         return destinationList;
     }
