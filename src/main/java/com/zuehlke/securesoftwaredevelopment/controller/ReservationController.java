@@ -1,6 +1,7 @@
 package com.zuehlke.securesoftwaredevelopment.controller;
 
 import com.zuehlke.securesoftwaredevelopment.config.AuditLogger;
+import com.zuehlke.securesoftwaredevelopment.config.SecurityUtil;
 import com.zuehlke.securesoftwaredevelopment.domain.Hotel;
 import com.zuehlke.securesoftwaredevelopment.domain.Reservation;
 import com.zuehlke.securesoftwaredevelopment.domain.RoomType;
@@ -9,6 +10,8 @@ import com.zuehlke.securesoftwaredevelopment.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,23 +34,36 @@ public class ReservationController {
     private HotelRepository hotelRepository;
     private RoomRepository roomRepository;
 
-    public ReservationController(ReservationRepository reservationRepository, HotelRepository hotelRepository, RoomRepository roomRepository) {
+    private final SecurityUtil securityUtil;
+
+    public ReservationController(ReservationRepository reservationRepository, HotelRepository hotelRepository, RoomRepository roomRepository,SecurityUtil securityUtil) {
         this.reservationRepository = reservationRepository;
         this.hotelRepository = hotelRepository;
         this.roomRepository = roomRepository;
+        this.securityUtil=securityUtil;
     }
 
     @GetMapping("/reservations/view")
+    @PreAuthorize("hasAuthority('VIEW_RESERVATION')")
     public String view(Model model, Authentication authentication) {
-        List<Reservation> allReservations = reservationRepository.getAll();
 
-        User user = (User) authentication.getPrincipal();
-        Integer userId = user.getId();
-        List<Reservation> userReservations = reservationRepository.forUser(userId);
-
-        model.addAttribute("allReservations", allReservations);
-        model.addAttribute("userReservations", userReservations);
-
+        if(securityUtil.hasPermissionCustomerEdition(authentication.getName())) {
+            User user = (User) authentication.getPrincipal();
+            Integer userId = user.getId();
+            List<Reservation> userReservations = reservationRepository.forUser(userId);
+            model.addAttribute("userReservations", userReservations);
+        }
+        else if(securityUtil.hasPermissionAdminEdition(authentication.getName())) {
+            List<Reservation> allReservations = reservationRepository.getAll();
+            User user = (User) authentication.getPrincipal();
+            Integer userId = user.getId();
+            List<Reservation> userReservations = reservationRepository.forUser(userId);
+            model.addAttribute("allReservations", allReservations);
+            model.addAttribute("userReservations", userReservations);
+        }
+        else{
+            throw new AccessDeniedException("You are not allowed to see reservations");
+        }
         return "reservations";
     }
 
@@ -70,6 +86,7 @@ public class ReservationController {
     }
 
     @PostMapping("/reservations/create")
+    @PreAuthorize("hasAuthority('CREATE_RESERVATION')")
     public String createReservation(
             @RequestParam Integer hotelId,
             @RequestParam Integer roomTypeId,

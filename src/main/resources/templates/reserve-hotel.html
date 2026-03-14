@@ -9,7 +9,7 @@
     <title>Create Reservation</title>
 </head>
 <body>
-<div layout:fragment="content">
+<div layout:fragment="content" sec:authorize="hasAuthority('CREATE_RESERVATION')">
     <h1>Create reservation</h1>
 
     <div class="row" th:unless="${created == true}">
