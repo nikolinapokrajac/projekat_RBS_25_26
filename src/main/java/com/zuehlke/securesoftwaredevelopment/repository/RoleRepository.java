@@ -35,8 +35,9 @@ public class RoleRepository {
                 String name = rs.getString(2);
                 roles.add(new Role(id, name));
             }
+            LOG.info("Uspješno učitane uloge za korisnika ID {}", userId);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom učitavanja uloga za korisnika ID {}: {}", userId, e.getMessage());
         }
         return roles;
     }

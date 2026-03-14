@@ -1,5 +1,6 @@
 package com.zuehlke.securesoftwaredevelopment.repository;
 
+import com.zuehlke.securesoftwaredevelopment.config.AuditLogger;
 import com.zuehlke.securesoftwaredevelopment.domain.HashedUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import java.sql.*;
 public class HashedUserRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(HashedUserRepository.class);
+    private static final AuditLogger auditLogger=AuditLogger.getAuditLogger(HashedUserRepository.class);
 
     private final DataSource dataSource;
 
@@ -28,10 +30,11 @@ public class HashedUserRepository {
                 String passwordHash = rs.getString(1);
                 String salt = rs.getString(2);
                 String totpKey = rs.getString(3);
+                LOG.info("Uspješno pronađen korisnik sa korisničkim imenom: {}", username);
                 return new HashedUser(username, passwordHash, salt, totpKey);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom pronalaženja korisnika sa korisničkim imenom {}: {}", username, e.getMessage());
         }
         return null;
     }
@@ -44,8 +47,12 @@ public class HashedUserRepository {
             statement.setString(2, username);
 
             statement.executeUpdate();
+            auditLogger.audit("Ažuriran TOTP ključ za korisnika: " + username);
+            LOG.info("Uspješno ažuriran TOTP ključ za korisnika: {}", username);
+
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom ažuriranja TOTP ključa za korisnika {}: {}", username, e.getMessage());
         }
     }
 }

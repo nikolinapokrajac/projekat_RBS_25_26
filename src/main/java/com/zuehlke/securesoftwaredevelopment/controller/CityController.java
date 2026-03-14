@@ -74,7 +74,7 @@ public class CityController {
         city.setName(name);
         city.setCountryId(countryId);
         cityRepository.create(city);
-
+        LOG.info("Novi grad dodan sa ID: {}", city.getId());
         return "redirect:/new-city";
     }
 }

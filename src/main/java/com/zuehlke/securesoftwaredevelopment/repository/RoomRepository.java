@@ -41,9 +41,10 @@ public class RoomRepository {
                 int totalRooms = rs.getInt(5);
 
                 roomTypes.add(new RoomType(id, hotelId, name, capacity, pricePerNight, totalRooms));
+                LOG.info("Uspešno učitani svi tipovi soba");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom učitavanja tipova soba: {}", e.getMessage());
         }
 
         return roomTypes;

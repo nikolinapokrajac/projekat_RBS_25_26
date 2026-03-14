@@ -28,10 +28,11 @@ public class UserRepository {
                 int id = rs.getInt(1);
                 String username1 = rs.getString(2);
                 String password = rs.getString(3);
+                LOG.info("Korisnik sa korisničkim imenom {} pronađen.", username);
                 return new User(id, username1, password);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom pronalaženja korisnika sa korisničkim imenom {}: {}", username, e.getMessage());
         }
         return null;
     }
@@ -43,10 +44,11 @@ public class UserRepository {
              ResultSet rs = statement.executeQuery(query)) {
             if (rs.next()) {
                 String username = rs.getString(1);
+                LOG.info("Korisničko ime za korisnika sa ID {} je {}", id, username);
                 return username;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom pronalaženja korisničkog imena za korisnika sa ID {}: {}", id, e.getMessage());
         }
         return null;
     }
@@ -59,8 +61,9 @@ public class UserRepository {
         ) {
             statement.setString(1, username);
             statement.executeUpdate();
+            LOG.info("Korisničko ime za korisnika sa ID {} uspješno ažurirano na {}", id, username);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom ažuriranja korisničkog imena za korisnika sa ID {}: {}", id, e.getMessage());
         }
     }
 
@@ -69,9 +72,10 @@ public class UserRepository {
         try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement();
              ResultSet rs = statement.executeQuery(query)) {
+            LOG.info("Provjera kredencijala za korisnika {}: {}", username, rs.next() ? "validni" : "nevalidni");
             return rs.next();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom provjere kredencijala za korisnika {}: {}", username, e.getMessage());
         }
         return false;
     }
@@ -82,8 +86,9 @@ public class UserRepository {
              Statement statement = connection.createStatement();
         ) {
             statement.executeUpdate(query);
+            LOG.info("Korisnik sa ID {} uspješno obrisan.", userId);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Greška prilikom brisanja korisnika sa ID {}: {}", userId, e.getMessage());
         }
     }
 }

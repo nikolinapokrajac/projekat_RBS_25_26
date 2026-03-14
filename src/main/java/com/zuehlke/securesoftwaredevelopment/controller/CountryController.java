@@ -51,8 +51,8 @@ public class CountryController {
             return "redirect:/new-country?nameTaken=true";
         }
 
-        countryRepository.create(new Country(name));
-
+        Long id=countryRepository.create(new Country(name));
+        LOG.info("Nova drzava dodana sa ID: {}", id);
         return "redirect:/new-country";
     }
 

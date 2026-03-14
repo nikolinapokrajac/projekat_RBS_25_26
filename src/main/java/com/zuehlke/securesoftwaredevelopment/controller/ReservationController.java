@@ -121,7 +121,8 @@ public class ReservationController {
         r.setTotalPrice(totalPrice);
 
         reservationRepository.create(r);
-
+        auditLogger.audit("Korisnik sa ID: " + user.getId() + " je kreirao rezervaciju: " + r.getId());
+        LOG.info("Korisnik sa ID: {} je kreirao rezervaciju: {}", user.getId(), r.getId());
         return redirectPage + "?created=true";
     }
 
