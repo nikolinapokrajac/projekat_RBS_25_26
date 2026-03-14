@@ -69,14 +69,21 @@ public class UserRepository {
 
     public boolean validCredentials(String username, String password) {
         String query = "SELECT username FROM users WHERE username='" + username + "' AND password='" + password + "'";
+
         try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement();
              ResultSet rs = statement.executeQuery(query)) {
-            LOG.info("Provjera kredencijala za korisnika {}: {}", username, rs.next() ? "validni" : "nevalidni");
-            return rs.next();
+
+            boolean valid = rs.next();
+
+            LOG.info("Provjera kredencijala za korisnika {}: {}", username, valid ? "validni" : "nevalidni");
+
+            return valid;
+
         } catch (SQLException e) {
             LOG.error("Greška prilikom provjere kredencijala za korisnika {}: {}", username, e.getMessage());
         }
+
         return false;
     }
 
